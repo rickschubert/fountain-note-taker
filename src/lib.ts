@@ -11,3 +11,7 @@ export const registerCommands = (context: vscode.ExtensionContext) => {
 export const showTooltipMessage = (message: string) => {
     vscode.window.showInformationMessage(message);
 }
+
+export const convertStringToArrayBuffer = (str: string) => {
+	return new TextEncoder().encode(str);
+}
