@@ -1,11 +1,16 @@
 import * as vscode from "vscode"
-import { showTooltipMessage, convertStringToArrayBuffer, createCopyOfString } from "../lib"
-import { fileToAddTodoNotesTo } from "../constants"
+import {convertStringToArrayBuffer, createCopyOfString} from "../lib"
+import {fileToAddTodoNotesTo} from "../constants"
 
 const getCurrentlySelectedTextRange = (): vscode.Range => {
     const activeEditor = vscode.window.activeTextEditor as vscode.TextEditor
     const selectedTextInfo = activeEditor.selection
-    const selTextRange = new vscode.Range(selectedTextInfo.start.line, selectedTextInfo.start.character, selectedTextInfo.end.line, selectedTextInfo.end.character)
+    const selTextRange = new vscode.Range(
+        selectedTextInfo.start.line,
+        selectedTextInfo.start.character,
+        selectedTextInfo.end.line,
+        selectedTextInfo.end.character
+    )
     return selTextRange
 }
 
@@ -26,10 +31,14 @@ export const cutOutCurrentlySelectedText = () => {
 
 type VsCodeFile = [string, vscode.FileType]
 
-const validateTodosFileExists = (directoryContents: VsCodeFile[])  => {
-    const todoFile = directoryContents.find((file) => file[0] === fileToAddTodoNotesTo)
+const validateTodosFileExists = (directoryContents: VsCodeFile[]) => {
+    const todoFile = directoryContents.find(
+        (file) => file[0] === fileToAddTodoNotesTo
+    )
     if (!todoFile) {
-        throw new Error(`You need a file to which we can add the note. This should be with your setup a file called "${fileToAddTodoNotesTo}".`)
+        throw new Error(
+            `You need a file to which we can add the note. This should be with your setup a file called "${fileToAddTodoNotesTo}".`
+        )
     }
 }
 
@@ -44,14 +53,24 @@ const getFileContent = async (todoUri: vscode.Uri): Promise<string> => {
 }
 
 const writeTodoFile = async (todoUri: vscode.Uri, newContent: string) => {
-    await vscode.workspace.fs.writeFile(todoUri, convertStringToArrayBuffer(newContent))
+    await vscode.workspace.fs.writeFile(
+        todoUri,
+        convertStringToArrayBuffer(newContent)
+    )
 }
 
 const getCurrentChapter = (): string | undefined => {
     const activeEditor = vscode.window.activeTextEditor as vscode.TextEditor
     const selectedTextedRange = getCurrentlySelectedTextRange()
-    const textRangeBeforeSelectedText = new vscode.Range(1, 0, selectedTextedRange.end.line, selectedTextedRange.end.character)
-    const textBeforeSelected = activeEditor.document.getText(textRangeBeforeSelectedText)
+    const textRangeBeforeSelectedText = new vscode.Range(
+        1,
+        0,
+        selectedTextedRange.end.line,
+        selectedTextedRange.end.character
+    )
+    const textBeforeSelected = activeEditor.document.getText(
+        textRangeBeforeSelectedText
+    )
     const headings = textBeforeSelected.match(/ #(\d).*#$/gm)
     if (headings) {
         const lastHeading = headings[headings.length - 1]
@@ -59,19 +78,28 @@ const getCurrentChapter = (): string | undefined => {
     }
 }
 
-const convertFountainChapterToMarkDownChapter = (fountainChapter: string): string => {
-    return fountainChapter.replace(/#$/,"").replace(/#/, "# ")
+const convertFountainChapterToMarkDownChapter = (
+    fountainChapter: string
+): string => {
+    return fountainChapter.replace(/#$/, "").replace(/#/, "# ")
 }
 
 const appendLineToText = (textBlock: string, line: string): string => {
-    return `${textBlock.trimRight()  }\n${  line  }\n`
+    return `${textBlock.trimRight()}\n${line}\n`
 }
 
-const appendNoteUnderNewHeading = (chapter: string, todoContent: string, noteToAdd: string): string => {
+const appendNoteUnderNewHeading = (
+    chapter: string,
+    todoContent: string,
+    noteToAdd: string
+): string => {
     return appendLineToText(todoContent, `\n${chapter}\n${noteToAdd}`)
 }
 
-const splitTodoTextAtMarkdownChapterMarking = (chapterMarking: string, fullText: string): string[] => {
+const splitTodoTextAtMarkdownChapterMarking = (
+    chapterMarking: string,
+    fullText: string
+): string[] => {
     return fullText.split(new RegExp(`(${chapterMarking})`, "gm"))
 }
 
@@ -82,55 +110,88 @@ const splitNoteBlockAtHeadingAfterIt = (noteBlock: string): string[] => {
     return textSplitAtFollowingHeading
 }
 
-const appendNoteToExistingNoteBlock = (chapter: string, todoContent: string, noteToAdd: string) => {
+const appendNoteToExistingNoteBlock = (
+    chapter: string,
+    todoContent: string,
+    noteToAdd: string
+) => {
     // TODO: This path still needs to be filled out
-    const textSplitAtHeading = splitTodoTextAtMarkdownChapterMarking(chapter, todoContent)
-    const textSplitAtFollowingHeading = splitNoteBlockAtHeadingAfterIt(textSplitAtHeading[2])
-    let newText = `${textSplitAtHeading[0].trimRight()  }\n\n${  chapter}`
+    const textSplitAtHeading = splitTodoTextAtMarkdownChapterMarking(
+        chapter,
+        todoContent
+    )
+    const textSplitAtFollowingHeading = splitNoteBlockAtHeadingAfterIt(
+        textSplitAtHeading[2]
+    )
+    let newText = `${textSplitAtHeading[0].trimRight()}\n\n${chapter}`
     if (textSplitAtFollowingHeading.length > 1) {
         // Move to the end of the text block
-        newText = `${newText.trimRight() + textSplitAtFollowingHeading[0].trimRight()  }\n${  noteToAdd.trimRight()  }\n\n${  textSplitAtFollowingHeading[1]  }${textSplitAtFollowingHeading[2].trimRight()}`
+        newText = `${newText.trimRight() +
+            textSplitAtFollowingHeading[0].trimRight()}\n${noteToAdd.trimRight()}\n\n${
+            textSplitAtFollowingHeading[1]
+        }${textSplitAtFollowingHeading[2].trimRight()}`
     } else {
         // Append to the end of the file
-        newText = `${newText + textSplitAtHeading[2].trimRight()  }\n${  noteToAdd.trimRight()}`
+        newText = `${newText +
+            textSplitAtHeading[2].trimRight()}\n${noteToAdd.trimRight()}`
     }
     return newText
 }
 
-const moveCurrentlySelectedTextIntoSpecificChapter = (chapter: string, todoContent: string): string => {
+const moveCurrentlySelectedTextIntoSpecificChapter = (
+    chapter: string,
+    todoContent: string
+): string => {
     const markDownChapter = convertFountainChapterToMarkDownChapter(chapter)
     let chapterMarking: any = createCopyOfString(todoContent)
-    chapterMarking = splitTodoTextAtMarkdownChapterMarking(markDownChapter, chapterMarking)
+    chapterMarking = splitTodoTextAtMarkdownChapterMarking(
+        markDownChapter,
+        chapterMarking
+    )
     console.log(chapterMarking)
     if (chapterMarking.length < 2) {
-        return appendNoteUnderNewHeading(markDownChapter, todoContent, getCurrentlySelectedText())
+        return appendNoteUnderNewHeading(
+            markDownChapter,
+            todoContent,
+            getCurrentlySelectedText()
+        )
     } else {
-        return appendNoteToExistingNoteBlock(markDownChapter, todoContent, getCurrentlySelectedText())
+        return appendNoteToExistingNoteBlock(
+            markDownChapter,
+            todoContent,
+            getCurrentlySelectedText()
+        )
     }
 }
 
-const addTextToChapterInTodosFile = async (todoUri: vscode.Uri, textToAppend: string) => {
+const addTextToChapterInTodosFile = async (
+    todoUri: vscode.Uri,
+    textToAppend: string
+) => {
     const chapter = getCurrentChapter()
     const todoContent = await getFileContent(todoUri)
     const newFileContent = chapter
-    ? moveCurrentlySelectedTextIntoSpecificChapter(chapter, todoContent)
-    : appendLineToText(todoContent, textToAppend)
+        ? moveCurrentlySelectedTextIntoSpecificChapter(chapter, todoContent)
+        : appendLineToText(todoContent, textToAppend)
     await writeTodoFile(todoUri, newFileContent)
 }
 
 const moveCurrentlySelectedTextIntoTodos = async () => {
     const workSpaceFolders = vscode.workspace.workspaceFolders
     if (!workSpaceFolders || workSpaceFolders.length > 1) {
-        return showTooltipMessage("It looks like you either don't have any folders opened or more than 1. This extension is not designed for such a setup. Please only open one folder in your workspace.")
+        throw new Error(
+            "It looks like you either don't have any folders opened or more than 1. This extension is not designed for such a setup. Please only open one folder in your workspace."
+        )
     }
-    const directoryContents = await vscode.workspace.fs.readDirectory(workSpaceFolders[0].uri)
+    const directoryContents = await vscode.workspace.fs.readDirectory(
+        workSpaceFolders[0].uri
+    )
     validateTodosFileExists(directoryContents)
     const todosFileUri = getTodosFileLocation(workSpaceFolders[0].uri)
     await addTextToChapterInTodosFile(todosFileUri, getCurrentlySelectedText())
 }
 
 export const moveToScriptTodos = async () => {
-    showTooltipMessage("Hello!")
     if (vscode.window.activeTextEditor) {
         await moveCurrentlySelectedTextIntoTodos()
         cutOutCurrentlySelectedText()
