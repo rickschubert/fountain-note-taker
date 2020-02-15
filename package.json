@@ -1,36 +1,57 @@
 {
-	"name": "helloworld-sample",
-	"displayName": "helloworld-sample",
-	"description": "HelloWorld example for VS Code",
-	"version": "0.0.1",
-	"publisher": "vscode-samples",
-	"repository": "https://github.com/Microsoft/vscode-extension-samples/helloworld-sample",
-	"engines": {
-		"vscode": "^1.34.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-		"onCommand:moveToTodos"
-	],
-	"main": "./out",
-	"contributes": {
-		"commands": [
-			{
-				"command": "moveToTodos",
-				"title": "Move to Script Todos"
-			}
-		]
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "npm run compile -- -watch"
-	},
-	"devDependencies": {
-		"@types/node": "^10.14.17",
-		"@types/vscode": "^1.34.0",
-		"typescript": "^3.5.1"
-	}
+    "name": "helloworld-sample",
+    "displayName": "helloworld-sample",
+    "description": "HelloWorld example for VS Code",
+    "version": "0.0.1",
+    "publisher": "vscode-samples",
+    "repository": "https://github.com/Microsoft/vscode-extension-samples/helloworld-sample",
+    "engines": {
+        "vscode": "^1.34.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:moveToTodos"
+    ],
+    "main": "./dist",
+    "contributes": {
+        "commands": [
+            {
+                "command": "moveToTodos",
+                "title": "Move to Script Todos"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "build": "node_modules/typescript/bin/tsc",
+        "lint": "./node_modules/eslint/bin/eslint.js 'src/**/*.ts'",
+        "watch": "npm run build -- --watch"
+    },
+    "devDependencies": {
+        "@types/node": "^10.14.17",
+        "@types/vscode": "^1.34.0",
+        "@typescript-eslint/eslint-plugin": "^2.19.2",
+        "@typescript-eslint/parser": "^2.19.2",
+        "eslint": "^6.8.0",
+        "eslint-config-rickschubert": "^1.0.11",
+        "husky": "^4.2.3",
+        "lint-staged": "^10.0.7",
+        "prettier": "^1.19.1",
+        "typescript": "^3.5.1"
+    },
+    "lint-staged": {
+        "*.js": [
+            "prettier --write",
+            "./node_modules/eslint/bin/eslint.js --fix"
+        ],
+        "*.ts": [
+            "prettier --write",
+            "./node_modules/eslint/bin/eslint.js --fix"
+        ],
+        "*.json": [
+            "prettier --write"
+        ]
+    }
 }
