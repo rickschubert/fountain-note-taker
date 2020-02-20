@@ -1,0 +1,7 @@
+if: branch = master
+env: TRAIVS_BRANCH=master
+github_token: $GITHUB_TOKEN
+language: node_js
+node_js:
+  - 12
+script: npm run publishTravis --scripts-prepend-node-path
