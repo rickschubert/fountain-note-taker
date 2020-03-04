@@ -3,8 +3,9 @@ import {
     convertStringToArrayBuffer,
     createCopyOfString,
     getActiveEditor,
+    getTodoFileContent,
 } from "../lib"
-import {fileToAddTodoNotesTo} from "../constants"
+import {fileToAddTodoNotesTo, allUuidsRegex} from "../constants"
 
 const getCurrentlySelectedTextRange = (): vscode.Range => {
     const activeEditor = getActiveEditor()
@@ -47,24 +48,12 @@ const validateTodosFileExists = (directoryContents: VsCodeFile[]) => {
     }
 }
 
-const getTodosFileLocation = (workspaceUri: vscode.Uri): vscode.Uri => {
-    return vscode.Uri.parse(`${workspaceUri}/${fileToAddTodoNotesTo}`)
-}
-
-const getFileContent = async (todoUri: vscode.Uri): Promise<string> => {
-    const fileContentBuffer = await vscode.workspace.fs.readFile(todoUri)
-    const fileContent = await fileContentBuffer.toString()
-    return fileContent
-}
-
 const writeTodoFile = async (todoUri: vscode.Uri, newContent: string) => {
     await vscode.workspace.fs.writeFile(
         todoUri,
         convertStringToArrayBuffer(newContent)
     )
 }
-
-const allUuidsRegex = /[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/gm
 
 const getCurrentChapterID = (): string | undefined => {
     const activeEditor = getActiveEditor()
@@ -173,11 +162,10 @@ const moveCurrentlySelectedTextIntoSpecificChapter = (
 }
 
 const addTextToChapterInTodosFile = async (
-    todoUri: vscode.Uri,
     textToAppend: string
 ) => {
     const chapter = getCurrentChapterID()
-    const todoContent = await getFileContent(todoUri)
+    const todoContent = await getTodoFileContent()
     const newFileContent = chapter
         ? moveCurrentlySelectedTextIntoSpecificChapter(chapter, todoContent)
         : appendLineToText(todoContent, textToAppend)
@@ -195,8 +183,7 @@ const moveCurrentlySelectedTextIntoTodos = async () => {
         workSpaceFolders[0].uri
     )
     validateTodosFileExists(directoryContents)
-    const todosFileUri = getTodosFileLocation(workSpaceFolders[0].uri)
-    await addTextToChapterInTodosFile(todosFileUri, getCurrentlySelectedText())
+    await addTextToChapterInTodosFile(getCurrentlySelectedText())
 }
 
 export const moveToScriptTodos = async () => {

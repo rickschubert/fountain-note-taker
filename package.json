@@ -13,7 +13,8 @@
     ],
     "activationEvents": [
         "onCommand:moveToTodos",
-        "onCommand:giveUniqueIdToHeading"
+        "onCommand:giveUniqueIdToHeading",
+        "onCommand:moveFountainHeadingsToTodos"
     ],
     "main": "./dist",
     "contributes": {
@@ -26,6 +27,11 @@
             {
                 "command": "giveUniqueIdToHeading",
                 "title": "Add comment with UUID before current location (to mark headings)",
+                "category": "Fountain Note Taker"
+            },
+            {
+                "command": "moveFountainHeadingsToTodos",
+                "title": "Update the todo headings with the ones from your fountain script",
                 "category": "Fountain Note Taker"
             }
         ]
