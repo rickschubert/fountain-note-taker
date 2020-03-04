@@ -34,6 +34,7 @@ export const cutOutCurrentlySelectedText = () => {
 }
 
 type VsCodeFile = [string, vscode.FileType]
+type uuid = string
 
 const validateTodosFileExists = (directoryContents: VsCodeFile[]) => {
     const todoFile = directoryContents.find(
@@ -63,7 +64,9 @@ const writeTodoFile = async (todoUri: vscode.Uri, newContent: string) => {
     )
 }
 
-const getCurrentChapter = (): string | undefined => {
+const allUuidsRegex = /[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/gm
+
+const getCurrentChapterID = (): string | undefined => {
     const activeEditor = getActiveEditor()
     const selectedTextedRange = getCurrentlySelectedTextRange()
     const textRangeBeforeSelectedText = new vscode.Range(
@@ -75,17 +78,18 @@ const getCurrentChapter = (): string | undefined => {
     const textBeforeSelected = activeEditor.document.getText(
         textRangeBeforeSelectedText
     )
-    const headings = textBeforeSelected.match(/ #(\d).*#$/gm)
+    const headings = textBeforeSelected.match(allUuidsRegex)
     if (headings) {
         const lastHeading = headings[headings.length - 1]
-        return lastHeading.trim()
+        return lastHeading
+            .trim()
+            .replace(/\//g, "")
+            .replace(/\*/g, "")
     }
 }
 
-const convertFountainChapterToMarkDownChapter = (
-    fountainChapter: string
-): string => {
-    return fountainChapter.replace(/#$/, "").replace(/#/, "# ")
+const createMarkdownComment = (content: string): string => {
+    return `<!-- ${content} -->`
 }
 
 const appendLineToText = (textBlock: string, line: string): string => {
@@ -110,7 +114,8 @@ const splitTodoTextAtMarkdownChapterMarking = (
 const splitNoteBlockAtHeadingAfterIt = (noteBlock: string): string[] => {
     // The noteblock that comes in does not have a heading - we can make use of that
     // to find the next heading
-    const textSplitAtFollowingHeading = noteBlock.split(/(# \d)/)
+    const markdownChapterMarker = /<!-- [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12} -->/
+    const textSplitAtFollowingHeading = noteBlock.split(markdownChapterMarker)
     return textSplitAtFollowingHeading
 }
 
@@ -119,7 +124,6 @@ const appendNoteToExistingNoteBlock = (
     todoContent: string,
     noteToAdd: string
 ) => {
-    // TODO: This path still needs to be filled out
     const textSplitAtHeading = splitTodoTextAtMarkdownChapterMarking(
         chapter,
         todoContent
@@ -127,13 +131,14 @@ const appendNoteToExistingNoteBlock = (
     const textSplitAtFollowingHeading = splitNoteBlockAtHeadingAfterIt(
         textSplitAtHeading[2]
     )
+    console.log({textSplitAtHeading, textSplitAtFollowingHeading})
     let newText = `${textSplitAtHeading[0].trimRight()}\n\n${chapter}`
     if (textSplitAtFollowingHeading.length > 1) {
         // Move to the end of the text block
         newText = `${newText.trimRight() +
-            textSplitAtFollowingHeading[0].trimRight()}\n${noteToAdd.trimRight()}\n\n${
+            textSplitAtFollowingHeading[0].trimRight()}\n${noteToAdd.trimRight()}\n\n${chapter}\n${
             textSplitAtFollowingHeading[1]
-        }${textSplitAtFollowingHeading[2].trimRight()}`
+        }`
     } else {
         // Append to the end of the file
         newText = `${newText +
@@ -143,16 +148,15 @@ const appendNoteToExistingNoteBlock = (
 }
 
 const moveCurrentlySelectedTextIntoSpecificChapter = (
-    chapter: string,
+    chapter: uuid,
     todoContent: string
 ): string => {
-    const markDownChapter = convertFountainChapterToMarkDownChapter(chapter)
+    const markDownChapter = createMarkdownComment(chapter)
     let chapterMarking: any = createCopyOfString(todoContent)
     chapterMarking = splitTodoTextAtMarkdownChapterMarking(
         markDownChapter,
         chapterMarking
     )
-    console.log(chapterMarking)
     if (chapterMarking.length < 2) {
         return appendNoteUnderNewHeading(
             markDownChapter,
@@ -172,7 +176,7 @@ const addTextToChapterInTodosFile = async (
     todoUri: vscode.Uri,
     textToAppend: string
 ) => {
-    const chapter = getCurrentChapter()
+    const chapter = getCurrentChapterID()
     const todoContent = await getFileContent(todoUri)
     const newFileContent = chapter
         ? moveCurrentlySelectedTextIntoSpecificChapter(chapter, todoContent)
