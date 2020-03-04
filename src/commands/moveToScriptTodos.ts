@@ -1,9 +1,13 @@
 import * as vscode from "vscode"
-import {convertStringToArrayBuffer, createCopyOfString} from "../lib"
+import {
+    convertStringToArrayBuffer,
+    createCopyOfString,
+    getActiveEditor,
+} from "../lib"
 import {fileToAddTodoNotesTo} from "../constants"
 
 const getCurrentlySelectedTextRange = (): vscode.Range => {
-    const activeEditor = vscode.window.activeTextEditor as vscode.TextEditor
+    const activeEditor = getActiveEditor()
     const selectedTextInfo = activeEditor.selection
     const selTextRange = new vscode.Range(
         selectedTextInfo.start.line,
@@ -15,7 +19,7 @@ const getCurrentlySelectedTextRange = (): vscode.Range => {
 }
 
 const getCurrentlySelectedText = (): string => {
-    const activeEditor = vscode.window.activeTextEditor as vscode.TextEditor
+    const activeEditor = getActiveEditor()
     return activeEditor.document.getText(getCurrentlySelectedTextRange())
 }
 
@@ -25,7 +29,7 @@ const removeCurrentlySelectedText = (editBuilder: vscode.TextEditorEdit) => {
 }
 
 export const cutOutCurrentlySelectedText = () => {
-    const activeEditor = vscode.window.activeTextEditor as vscode.TextEditor
+    const activeEditor = getActiveEditor()
     activeEditor.edit(removeCurrentlySelectedText)
 }
 
@@ -60,7 +64,7 @@ const writeTodoFile = async (todoUri: vscode.Uri, newContent: string) => {
 }
 
 const getCurrentChapter = (): string | undefined => {
-    const activeEditor = vscode.window.activeTextEditor as vscode.TextEditor
+    const activeEditor = getActiveEditor()
     const selectedTextedRange = getCurrentlySelectedTextRange()
     const textRangeBeforeSelectedText = new vscode.Range(
         1,
