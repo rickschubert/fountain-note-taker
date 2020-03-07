@@ -38,11 +38,12 @@
     },
     "scripts": {
         "fixHusky": "npx --no-install husky-upgrade",
-        "build": "yarn rimraf dist && yarn tsc",
+        "build": "rimraf dist && yarn tsc",
         "lint": "./node_modules/eslint/bin/eslint.js 'src/**/*.ts'",
         "watch": "npm run build -- --watch",
         "release": "npm run build && yarn vsce package && yarn vsce publish minor",
-        "publishTravis": "bash scripts/publishTravis.sh"
+        "publishTravis": "bash scripts/publishTravis.sh",
+        "cleani": "npx rimraf node_modules && npm install"
     },
     "devDependencies": {
         "@types/jest": "^25.1.4",
@@ -61,7 +62,7 @@
         "shelljs": "^0.8.3",
         "ts-jest": "^25.2.1",
         "typescript": "^3.5.1",
-        "vsce": "^1.73.0"
+        "vsce": "^1.74.0"
     },
     "husky": {
         "hooks": {
