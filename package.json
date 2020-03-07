@@ -42,7 +42,6 @@
         "lint": "./node_modules/eslint/bin/eslint.js 'src/**/*.ts'",
         "watch": "npm run build -- --watch",
         "release": "npm run build && yarn vsce package && yarn vsce publish minor && npm run cleanReleaseFiles",
-        "publishTravis": "bash scripts/publishTravis.sh",
         "cleani": "npx rimraf node_modules && npm install",
         "test": "jest",
         "cleanReleaseFiles": "npx rimraf fountain-note-taker*.vsix"
