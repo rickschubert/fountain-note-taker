@@ -1,7 +1,7 @@
 import {replaceMarkdownHeadingAfterUuidWithNewHeading} from "../moveFountainHeadingsToTodos"
 
-describe("Replacing heading in markdown document with new heading", () => {
-    it("Adds new heading if no heading was not yet present", () => {
+describe("Moving headings from fountain script into correlating todo sections", () => {
+    it("Adds new heading if heading was not yet present", () => {
         const uuid = "c0ab248e-6e66-4023-b283-13e8021639f0"
         const newHeading = "A random new heading up in here!"
         const fullTodoContentBefore = `

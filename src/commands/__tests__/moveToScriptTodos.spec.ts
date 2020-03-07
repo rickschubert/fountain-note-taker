@@ -1,7 +1,7 @@
 import {placeTextIntoTodosFile} from "../moveToScriptTodos"
 
-describe("Adding text to the todos file", () => {
-    it("Moves text into specific chapter", () => {
+describe("Adding new notes into the todos file", () => {
+    it("Moves note into specific chapter", () => {
         const replaceToken = "|||NEWNOTE|||"
         const chapterUuid = "07532be5-5d07-4d11-ad12-7c11f3c06792"
         const todoBase = `
@@ -29,7 +29,7 @@ describe("Adding text to the todos file", () => {
         expect(placeTextIntoTodosFile(chapterUuid, todoBefore, newNote)).toEqual(todoAfter)
     })
 
-    it("Moves text into new chapter, if chapter is not present", () => {
+    it("Moves note into new chapter if chapter was not yet present", () => {
         const replaceToken = "|||NEWNOTE|||"
         const chapterUuidNotInTodos = "07532be5-5d07-4d11-ad12-7c11f3c06792"
         const todoBase = `
