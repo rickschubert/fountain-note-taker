@@ -1,9 +1,10 @@
 import * as vscode from "vscode"
 import {
-    convertStringToArrayBuffer,
     createCopyOfString,
     getActiveEditor,
     getTodoFileContent,
+    getWorkspaceUri,
+    writeTodoFile,
 } from "../lib"
 import {fileToAddTodoNotesTo, allUuidsRegex} from "../constants"
 
@@ -46,13 +47,6 @@ const validateTodosFileExists = (directoryContents: VsCodeFile[]) => {
             `You need a file to which we can add the note. This should be with your setup a file called "${fileToAddTodoNotesTo}".`
         )
     }
-}
-
-const writeTodoFile = async (todoUri: vscode.Uri, newContent: string) => {
-    await vscode.workspace.fs.writeFile(
-        todoUri,
-        convertStringToArrayBuffer(newContent)
-    )
 }
 
 const getCurrentChapterID = (): string | undefined => {
@@ -169,19 +163,12 @@ const addTextToChapterInTodosFile = async (
     const newFileContent = chapter
         ? moveCurrentlySelectedTextIntoSpecificChapter(chapter, todoContent)
         : appendLineToText(todoContent, textToAppend)
-    await writeTodoFile(todoUri, newFileContent)
+    await writeTodoFile(newFileContent)
 }
 
 const moveCurrentlySelectedTextIntoTodos = async () => {
-    const workSpaceFolders = vscode.workspace.workspaceFolders
-    if (!workSpaceFolders || workSpaceFolders.length > 1) {
-        throw new Error(
-            "It looks like you either don't have any folders opened or more than 1. This extension is not designed for such a setup. Please only open one folder in your workspace."
-        )
-    }
-    const directoryContents = await vscode.workspace.fs.readDirectory(
-        workSpaceFolders[0].uri
-    )
+    const workspaceUri = getWorkspaceUri()
+    const directoryContents = await vscode.workspace.fs.readDirectory(workspaceUri)
     validateTodosFileExists(directoryContents)
     await addTextToChapterInTodosFile(getCurrentlySelectedText())
 }

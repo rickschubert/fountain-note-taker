@@ -25,14 +25,15 @@
     },
     "overrides": [
       {
-        "files": ["src/tests/**/*.ts"],
+        "files": ["src/**/*spec.ts"],
         "globals": {
           "describe": true,
           "it": true,
           "expect": true,
           "beforeAll": true,
           "beforeEach": true,
-          "jest": true        }
+          "jest": true
+        }
       }
     ]
   }
