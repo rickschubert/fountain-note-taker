@@ -41,7 +41,7 @@
         "build": "yarn rimraf dist && yarn tsc",
         "lint": "./node_modules/eslint/bin/eslint.js 'src/**/*.ts'",
         "watch": "npm run build -- --watch",
-        "publish": "npm run build && yarn vsce package && yarn vsce publish minor",
+        "release": "npm run build && yarn vsce package && yarn vsce publish minor",
         "publishTravis": "bash scripts/publishTravis.sh"
     },
     "devDependencies": {
