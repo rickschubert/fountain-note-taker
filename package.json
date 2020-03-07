@@ -21,17 +21,17 @@
         "commands": [
             {
                 "command": "moveToTodos",
-                "title": "Move to Script Todos",
+                "title": "Move text into todo document",
                 "category": "Fountain Note Taker"
             },
             {
                 "command": "giveUniqueIdToHeading",
-                "title": "Add comment with UUID before current location (to mark headings)",
+                "title": "Mark heading with UUID",
                 "category": "Fountain Note Taker"
             },
             {
                 "command": "moveFountainHeadingsToTodos",
-                "title": "Update the todo headings with the ones from your fountain script",
+                "title": "Apply scene headings onto todo document",
                 "category": "Fountain Note Taker"
             }
         ]
