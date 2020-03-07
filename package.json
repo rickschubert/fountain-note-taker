@@ -43,7 +43,8 @@
         "watch": "npm run build -- --watch",
         "release": "npm run build && yarn vsce package && yarn vsce publish minor",
         "publishTravis": "bash scripts/publishTravis.sh",
-        "cleani": "npx rimraf node_modules && npm install"
+        "cleani": "npx rimraf node_modules && npm install",
+        "test": "jest"
     },
     "devDependencies": {
         "@types/jest": "^25.1.4",

@@ -1,4 +1,4 @@
-import {getActiveEditor, getTodoFileContent, writeTodoFile, showTooltipMessage} from "../lib"
+import {getActiveEditor, getTodoFileContent, writeTodoFile} from "../lib"
 import {allUuidsRegex} from "../constants"
 import * as vscode from "vscode"
 /* eslint-disable complexity */
@@ -6,12 +6,10 @@ import * as vscode from "vscode"
 
 export const moveFountainHeadingsToTodos = async () => {
     if (vscode.window.activeTextEditor) {
-        showTooltipMessage("Updating headings - don't amend document until finished.")
         const activeEditor = getActiveEditor()
         const script = activeEditor.document.getText()
         const uuidsInScript = script.match(allUuidsRegex)
         await findFountainHeadingsAndMoveThemToTodos(uuidsInScript, script)
-        showTooltipMessage("Finished updating headings.")
     }
 }
 
@@ -29,16 +27,37 @@ const getFountainSceneHeadingThatIsPlacedAfterUuid = (
     }
 }
 
+const getUpdatedTodoDocumentWithHeadingsFromFountainScript = async (
+    uuidsInScript: RegExpMatchArray,
+    script: string
+): Promise<string> => {
+    const todoFileContent = await getTodoFileContent()
+    const newTodoFile = uuidsInScript.reduce((todos, uuid) => {
+        const fountainHeading = getFountainSceneHeadingThatIsPlacedAfterUuid(
+            script,
+            uuid
+        )
+        if (fountainHeading) {
+            return replaceMarkdownHeadingAfterUuidWithNewHeading(
+                todos,
+                uuid,
+                fountainHeading,
+            )
+        } else {
+            return todos
+        }
+    }, todoFileContent)
+    return newTodoFile
+}
+
+
 const findFountainHeadingsAndMoveThemToTodos = async (
     uuidsInScript: RegExpMatchArray | null,
     script: string
 ) => {
     if (uuidsInScript) {
-        for (let index = 0; index < uuidsInScript.length; index++) {
-            const uuid = uuidsInScript[index]
-            // eslint-disable-next-line no-await-in-loop
-            await findFountainHeadingAndMoveToTodo(script, uuid)
-        }
+        const newTodoFileContent = await getUpdatedTodoDocumentWithHeadingsFromFountainScript(uuidsInScript, script)
+        await writeTodoFile(newTodoFileContent)
     }
 }
 
@@ -57,20 +76,4 @@ export const replaceMarkdownHeadingAfterUuidWithNewHeading = (todoContent: strin
         return fullHeading.replace(/\n#(?:.(?!#))+$/, "")
     })
     return newTodoContent
-}
-
-const findFountainHeadingAndMoveToTodo = async (script: string, uuid: string) => {
-    const fountainHeading = getFountainSceneHeadingThatIsPlacedAfterUuid(
-        script,
-        uuid
-    )
-    if (fountainHeading) {
-        const todoFileContent = await getTodoFileContent()
-        const newTodoFileContent = replaceMarkdownHeadingAfterUuidWithNewHeading(
-            todoFileContent,
-            uuid,
-            fountainHeading
-        )
-        await writeTodoFile(newTodoFileContent)
-    }
 }
