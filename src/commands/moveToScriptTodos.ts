@@ -49,7 +49,7 @@ const validateTodosFileExists = (directoryContents: VsCodeFile[]) => {
     }
 }
 
-const getCurrentChapterID = (): uuid | undefined => {
+const getCurrentChapterUuidFromFountainScript = (): uuid | undefined => {
     const activeEditor = getActiveEditor()
     const selectedTextedRange = getCurrentlySelectedTextRange()
     const textRangeBeforeSelectedText = new vscode.Range(
@@ -173,7 +173,7 @@ export const placeTextIntoTodosFile = (
 const addTextToChapterInTodosFile = async (
     textToAppend: string
 ): Promise<string> => {
-    const chapter = getCurrentChapterID()
+    const chapter = getCurrentChapterUuidFromFountainScript()
     const todoContent = await getTodoFileContent()
     const newFileContent = placeTextIntoTodosFile(chapter, todoContent, textToAppend)
     return newFileContent
