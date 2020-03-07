@@ -2,14 +2,14 @@ import {replaceMarkdownHeadingAfterUuidWithNewHeading} from "../moveFountainHead
 
 describe("Replacing heading in markdown document with new heading", () => {
     it("Adds new heading if no heading was yet present", () => {
-        const uuid = "07532be5-5d07-4d11-ad12-7c11f3c06792"
+        const uuid = "c0ab248e-6e66-4023-b283-13e8021639f0"
         const newHeading = "A random new heading up in here!"
         const fullTodoContentBefore = `
 # 2-1
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 
-<!-- 07532be5-5d07-4d11-ad12-7c11f3c06792 -->
+<!-- c0ab248e-6e66-4023-b283-13e8021639f0 -->
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 
@@ -28,7 +28,7 @@ describe("Replacing heading in markdown document with new heading", () => {
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 
-<!-- 07532be5-5d07-4d11-ad12-7c11f3c06792 -->
+<!-- c0ab248e-6e66-4023-b283-13e8021639f0 -->
 # ${newHeading}
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
@@ -65,7 +65,7 @@ describe("Replacing heading in markdown document with new heading", () => {
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 
-<!-- 07532be5-5d07-4d11-ad12-7c11f3c06792 -->
+<!-- c0ab248e-6e66-4023-b283-13e8021639f0 -->
 # 2-5
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
@@ -85,7 +85,7 @@ describe("Replacing heading in markdown document with new heading", () => {
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 
-<!-- 07532be5-5d07-4d11-ad12-7c11f3c06792 -->
+<!-- c0ab248e-6e66-4023-b283-13e8021639f0 -->
 # 2-5
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd
 - asdfdsf ashjlf halskf hsdalfj hasdjfkl saklfd ajklhsd

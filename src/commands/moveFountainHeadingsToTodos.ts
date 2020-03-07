@@ -50,7 +50,6 @@ const getUpdatedTodoDocumentWithHeadingsFromFountainScript = async (
     return newTodoFile
 }
 
-
 const findFountainHeadingsAndMoveThemToTodos = async (
     uuidsInScript: RegExpMatchArray | null,
     script: string

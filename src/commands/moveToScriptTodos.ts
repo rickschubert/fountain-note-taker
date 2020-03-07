@@ -49,7 +49,7 @@ const validateTodosFileExists = (directoryContents: VsCodeFile[]) => {
     }
 }
 
-const getCurrentChapterID = (): string | undefined => {
+const getCurrentChapterID = (): uuid | undefined => {
     const activeEditor = getActiveEditor()
     const selectedTextedRange = getCurrentlySelectedTextRange()
     const textRangeBeforeSelectedText = new vscode.Range(
@@ -94,11 +94,15 @@ const splitTodoTextAtMarkdownChapterMarking = (
     return fullText.split(new RegExp(`(${chapterMarking})`, "gm"))
 }
 
-const splitNoteBlockAtHeadingAfterIt = (noteBlock: string): string[] => {
+const splitNoteBlockAtFollowingChapterUuid = (noteBlock: string): string[] => {
     // The noteblock that comes in does not have a heading - we can make use of that
     // to find the next heading
-    const markdownChapterMarker = /<!-- [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12} -->/
+    const markdownChapterMarker = /(?=<!-- [a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12} -->)/
+    // const followingChapterUuid = noteBlock.match(markdownChapterMarker)
     const textSplitAtFollowingHeading = noteBlock.split(markdownChapterMarker)
+    // if (followingChapterUuid) {
+    //     textSplitAtFollowingHeading[0] = `${followingChapterUuid}${textSplitAtFollowingHeading[0]}`
+    // }
     return textSplitAtFollowingHeading
 }
 
@@ -111,15 +115,14 @@ const appendNoteToExistingNoteBlock = (
         chapter,
         todoContent
     )
-    const textSplitAtFollowingHeading = splitNoteBlockAtHeadingAfterIt(
+    const textSplitAtFollowingHeading = splitNoteBlockAtFollowingChapterUuid(
         textSplitAtHeading[2]
     )
-    console.log({textSplitAtHeading, textSplitAtFollowingHeading})
     let newText = `${textSplitAtHeading[0].trimRight()}\n\n${chapter}`
     if (textSplitAtFollowingHeading.length > 1) {
         // Move to the end of the text block
         newText = `${newText.trimRight() +
-            textSplitAtFollowingHeading[0].trimRight()}\n${noteToAdd.trimRight()}\n\n${chapter}\n${
+            textSplitAtFollowingHeading[0].trimRight()}\n${noteToAdd.trimRight()}\n\n${
             textSplitAtFollowingHeading[1]
         }`
     } else {
@@ -132,45 +135,57 @@ const appendNoteToExistingNoteBlock = (
 
 const moveCurrentlySelectedTextIntoSpecificChapter = (
     chapter: uuid,
-    todoContent: string
+    todoContent: string,
+    textToAppend: string,
 ): string => {
     const markDownChapter = createMarkdownComment(chapter)
-    let chapterMarking: any = createCopyOfString(todoContent)
-    chapterMarking = splitTodoTextAtMarkdownChapterMarking(
+    const todoContentToMutate = createCopyOfString(todoContent)
+    const chapterMarking = splitTodoTextAtMarkdownChapterMarking(
         markDownChapter,
-        chapterMarking
+        todoContentToMutate
     )
     if (chapterMarking.length < 2) {
         return appendNoteUnderNewHeading(
             markDownChapter,
             todoContent,
-            getCurrentlySelectedText()
+            textToAppend,
         )
     } else {
         return appendNoteToExistingNoteBlock(
             markDownChapter,
             todoContent,
-            getCurrentlySelectedText()
+            textToAppend,
         )
     }
 }
 
+export const placeTextIntoTodosFile = (
+    chapter: uuid | undefined,
+    todoContent: string,
+    textToAppend: string,
+) => {
+    const newFileContent = chapter
+        ? moveCurrentlySelectedTextIntoSpecificChapter(chapter, todoContent, textToAppend)
+        : appendLineToText(todoContent, textToAppend)
+    return newFileContent
+}
+
 const addTextToChapterInTodosFile = async (
     textToAppend: string
-) => {
+): Promise<string> => {
     const chapter = getCurrentChapterID()
     const todoContent = await getTodoFileContent()
-    const newFileContent = chapter
-        ? moveCurrentlySelectedTextIntoSpecificChapter(chapter, todoContent)
-        : appendLineToText(todoContent, textToAppend)
-    await writeTodoFile(newFileContent)
+    const newFileContent = placeTextIntoTodosFile(chapter, todoContent, textToAppend)
+    return newFileContent
 }
 
 const moveCurrentlySelectedTextIntoTodos = async () => {
     const workspaceUri = getWorkspaceUri()
     const directoryContents = await vscode.workspace.fs.readDirectory(workspaceUri)
     validateTodosFileExists(directoryContents)
-    await addTextToChapterInTodosFile(getCurrentlySelectedText())
+    const newFileContent = await addTextToChapterInTodosFile(getCurrentlySelectedText())
+    await writeTodoFile(newFileContent)
+
 }
 
 export const moveToScriptTodos = async () => {
