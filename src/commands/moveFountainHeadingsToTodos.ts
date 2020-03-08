@@ -1,8 +1,6 @@
 import {getActiveEditor, getTodoFileContent, writeTodoFile} from "../lib"
 import {allUuidsRegex} from "../constants"
 import * as vscode from "vscode"
-/* eslint-disable complexity */
-/* eslint-disable no-useless-escape */
 
 export const moveFountainHeadingsToTodos = async () => {
     if (vscode.window.activeTextEditor) {
@@ -17,6 +15,7 @@ const getFountainSceneHeadingThatIsPlacedAfterUuid = (
     fullScript: string,
     uuid: string
 ): string | undefined => {
+    // eslint-disable-next-line no-useless-escape
     const specificFountainHeadingRegex = new RegExp(`${uuid}\\*\/(.+)`, "s")
     const headingMatch = fullScript.match(specificFountainHeadingRegex)
     if (headingMatch && headingMatch.length > 1) {
@@ -41,7 +40,7 @@ const getUpdatedTodoDocumentWithHeadingsFromFountainScript = async (
             return replaceMarkdownHeadingAfterUuidWithNewHeading(
                 todos,
                 uuid,
-                fountainHeading,
+                fountainHeading
             )
         } else {
             return todos
@@ -55,15 +54,20 @@ const findFountainHeadingsAndMoveThemToTodos = async (
     script: string
 ) => {
     if (uuidsInScript) {
-        const newTodoFileContent = await getUpdatedTodoDocumentWithHeadingsFromFountainScript(uuidsInScript, script)
+        const newTodoFileContent = await getUpdatedTodoDocumentWithHeadingsFromFountainScript(
+            uuidsInScript,
+            script
+        )
         await writeTodoFile(newTodoFileContent)
     }
 }
 
-export const replaceMarkdownHeadingAfterUuidWithNewHeading = (todoContent: string, uuid: string, newHeading: string) => {
-    const todoSection = todoContent.match(
-        new RegExp(`${uuid} -->(.+)`, "s")
-    )
+export const replaceMarkdownHeadingAfterUuidWithNewHeading = (
+    todoContent: string,
+    uuid: string,
+    newHeading: string
+) => {
+    const todoSection = todoContent.match(new RegExp(`${uuid} -->(.+)`, "s"))
     if (todoSection !== null && todoSection.length < 1) {
         return todoContent
     }
@@ -71,8 +75,9 @@ export const replaceMarkdownHeadingAfterUuidWithNewHeading = (todoContent: strin
     // Add new heading straight after markdown UUID comment
     let newTodoContent = todoContent.replace(`${uuid} -->`, uuidAndNewHeading)
     // Remove previous heading, if one was present
-    newTodoContent = newTodoContent.replace(new RegExp(`${uuidAndNewHeading}\n#.*?$`, "m"), (fullHeading) => {
-        return fullHeading.replace(/\n#(?:.(?!#))+$/, "")
-    })
+    newTodoContent = newTodoContent.replace(
+        new RegExp(`${uuidAndNewHeading}\n#.*?$`, "m"),
+        uuidAndNewHeading
+    )
     return newTodoContent
 }
