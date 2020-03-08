@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/rickschubert/fountain-note-taker.svg?branch=master)](https://travis-ci.com/rickschubert/fountain-note-taker)
 
 Fountain Note Taker
 ===================
