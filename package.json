@@ -67,8 +67,7 @@
     },
     "husky": {
         "hooks": {
-            "pre-commit": "lint-staged",
-            "pre-push": "npm version minor"
+            "pre-commit": "lint-staged"
         }
     },
     "lint-staged": {
