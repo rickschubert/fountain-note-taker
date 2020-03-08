@@ -1,0 +1,39 @@
+{
+    "extends": "rickschubert",
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": 6,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "modules": true
+      }
+    },
+    "plugins": ["@typescript-eslint"],
+    "settings": {
+      "import/resolver": {
+        "node": {
+          "extensions": [".js"],
+          "paths": ["."]
+        }
+      }
+    },
+    "rules": {
+      "no-console": 0,
+      "no-template-curly-in-string": 0,
+      "linebreak-style": 0
+    },
+    "overrides": [
+      {
+        "files": ["src/**/*spec.ts"],
+        "globals": {
+          "describe": true,
+          "it": true,
+          "expect": true,
+          "beforeAll": true,
+          "beforeEach": true,
+          "jest": true
+        }
+      }
+    ]
+  }

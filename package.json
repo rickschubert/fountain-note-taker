@@ -1,0 +1,91 @@
+{
+    "name": "fountain-note-taker",
+    "displayName": "fountain-note-taker",
+    "description": "",
+    "version": "0.29.0",
+    "publisher": "rickschubert",
+    "repository": "https://github.com/rickschubert/fountain-note-taker",
+    "engines": {
+        "vscode": "^1.34.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:moveToTodos",
+        "onCommand:giveUniqueIdToHeading",
+        "onCommand:moveFountainHeadingsToTodos"
+    ],
+    "main": "./dist",
+    "contributes": {
+        "commands": [
+            {
+                "command": "moveToTodos",
+                "title": "Move text into todo document",
+                "category": "Fountain Note Taker"
+            },
+            {
+                "command": "giveUniqueIdToHeading",
+                "title": "Mark heading with UUID",
+                "category": "Fountain Note Taker"
+            },
+            {
+                "command": "moveFountainHeadingsToTodos",
+                "title": "Apply scene headings onto todo document",
+                "category": "Fountain Note Taker"
+            }
+        ]
+    },
+    "scripts": {
+        "fixHusky": "npx --no-install husky-upgrade",
+        "build": "rimraf dist && yarn tsc",
+        "lint": "./node_modules/eslint/bin/eslint.js 'src/**/*.ts'",
+        "watch": "npm run build -- --watch",
+        "release": "npm run build && npm test && yarn vsce package && yarn vsce publish minor && npm run cleanReleaseFiles",
+        "cleani": "npx rimraf node_modules && npm install",
+        "test": "jest",
+        "cleanReleaseFiles": "npx rimraf fountain-note-taker*.vsix"
+    },
+    "devDependencies": {
+        "@types/jest": "^25.1.4",
+        "@types/node": "^10.14.17",
+        "@types/uuid": "^7.0.0",
+        "@types/vscode": "^1.34.0",
+        "@typescript-eslint/eslint-plugin": "^2.19.2",
+        "@typescript-eslint/parser": "^2.19.2",
+        "eslint": "^6.8.0",
+        "eslint-config-rickschubert": "^1.0.11",
+        "husky": "^4.2.3",
+        "jest": "^25.1.0",
+        "lint-staged": "^10.0.7",
+        "prettier": "^1.19.1",
+        "rimraf": "^3.0.2",
+        "shelljs": "^0.8.3",
+        "ts-jest": "^25.2.1",
+        "typescript": "^3.5.1",
+        "vsce": "^1.74.0"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged",
+            "pre-push": "npm version minor"
+        }
+    },
+    "lint-staged": {
+        "*.js": [
+            "prettier --write",
+            "./node_modules/eslint/bin/eslint.js --fix"
+        ],
+        "*.ts": [
+            "prettier --write",
+            "./node_modules/eslint/bin/eslint.js --fix"
+        ],
+        "*.json": [
+            "prettier --write"
+        ]
+    },
+    "dependencies": {
+        "eol": "^0.9.1",
+        "uuid": "^7.0.2"
+    }
+}
