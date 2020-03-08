@@ -17,4 +17,5 @@ upload_files() {
 }
 
 setup_git
+git commit -m "empty one to test" --allow-empty
 upload_files
