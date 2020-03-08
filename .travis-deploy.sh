@@ -17,5 +17,6 @@ upload_files() {
 }
 
 setup_git
-git commit -m "empty one to test" --allow-empty
+yarn vsce package
+yarn vsce publish minor -p "${VSCODEPUBLISHTOKEN}"
 upload_files
