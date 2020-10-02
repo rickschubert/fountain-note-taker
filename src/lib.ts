@@ -2,7 +2,7 @@ import * as vscode from "vscode"
 import {moveToScriptTodos} from "./commands/moveToScriptTodos"
 import {giveUniqueIdToHeading} from "./commands/giveUniqueIdToHeading"
 import {moveFountainHeadingsToTodos} from "./commands/moveFountainHeadingsToTodos"
-import { fileToAddTodoNotesTo } from "./constants"
+import {fileToAddTodoNotesTo} from "./constants"
 import * as eol from "eol"
 
 const registerCommand = (
@@ -14,26 +14,29 @@ const registerCommand = (
     })
 }
 
-export const registerCommands = (context: vscode.ExtensionContext) => {
+export const registerCommands = (context: vscode.ExtensionContext): void => {
     const commands: vscode.Disposable[] = [
         registerCommand("moveToTodos", moveToScriptTodos),
         registerCommand("giveUniqueIdToHeading", giveUniqueIdToHeading),
-        registerCommand("moveFountainHeadingsToTodos", moveFountainHeadingsToTodos),
+        registerCommand(
+            "moveFountainHeadingsToTodos",
+            moveFountainHeadingsToTodos
+        ),
     ]
     commands.forEach((command) => {
         context.subscriptions.push(command)
     })
 }
 
-export const showTooltipMessage = (message: string) => {
+export const showTooltipMessage = (message: string): void => {
     vscode.window.showInformationMessage(message)
 }
 
-export const convertStringToArrayBuffer = (str: string) => {
+export const convertStringToArrayBuffer = (str: string): Uint8Array => {
     return new TextEncoder().encode(str)
 }
 
-export const createCopyOfString = (str: string) => {
+export const createCopyOfString = (str: string): string => {
     return ` ${str}`.slice(1)
 }
 
@@ -77,7 +80,7 @@ export const getWorkspaceUri = (): vscode.Uri => {
     return workSpaceFolders[0].uri
 }
 
-export const writeTodoFile = async (newContent: string) => {
+export const writeTodoFile = async (newContent: string): Promise<void> => {
     const todoUri = getTodosFileLocation()
     const newContentNormalisedForOS = eol.auto(newContent)
     await vscode.workspace.fs.writeFile(
